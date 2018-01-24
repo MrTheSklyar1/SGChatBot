@@ -3,56 +3,76 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Data.SqlClient;
+using System.Linq;
+using System.Text;
 using System.Threading;
-using System.Windows.Forms;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Documents;
+using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
+using System.Windows.Shapes;
+using System.Windows.Threading;
 using Telegram.Bot.Types;
 using File = System.IO.File;
 
 namespace ChatBot
 {
-    public partial class BotForm : Form
+    /// <summary>
+    /// Interaction logic for MainWindow.xaml
+    /// </summary>
+    public partial class MainWindow : Window
     {
         bool autostart = false;
         string constr = "";
         BackgroundWorker bw;
         decimal timer_time = 0;
-        public BotForm()
+        private DispatcherTimer timer;
+        public MainWindow()
         {
+            InitializeComponent();
+            Closing += OnClosing;
+            timer = new DispatcherTimer();
+            timer.Interval = TimeSpan.FromSeconds(1);
+            timer.Tick += TimerOnTick;
             try
             {
-                InitializeComponent();
-                try
-                {
-                    string alltext = File.ReadAllText("settings.txt");
-                    string[] keyAndSql = alltext.Split('|');
-                    textBox1.Text = keyAndSql[0];
-                    constr = keyAndSql[1];
-                }
-                catch(Exception ex)
-                {
-                    File.WriteAllText(DateTime.Now.ToString("dd.MM.yy hh.mm.ss") + " errorlog.txt", DateTime.Now + " -- " + "Settings file not found or file is corrupted");
-                    Application.Exit();
-                }
-                bw = new BackgroundWorker();
-                bw.DoWork += bw_DoWork;
-                if (textBox1.Text != "")
-                {
-                    var text = @textBox1.Text;
-                    if (text != "" && bw.IsBusy != true)
-                    {
-                        bw.RunWorkerAsync(text);
-                        timer1.Start();
-                        autostart = true;
-                    }
-                }
+                string alltext = File.ReadAllText("settings.txt");
+                string[] keyAndSql = alltext.Split('|');
+                KeyText.Text = keyAndSql[0];
+                constr = keyAndSql[1];
             }
             catch (Exception ex)
             {
-                File.WriteAllText(DateTime.Now.ToString("dd.MM.yy hh.mm.ss") + " errorlog.txt", DateTime.Now + " -- " + ex.Message + "\n"
-                    + ex.TargetSite.Name + "\n" + ex.StackTrace + "\n" + ex.HelpLink);
-                Application.Exit();
+                MessageBox.Show("Settings file not found or file is corrupted", "Alert", MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+                File.WriteAllText(DateTime.Now.ToString("dd.MM.yy hh.mm.ss") + " errorlog.txt", DateTime.Now + " -- " + "Settings file not found or file is corrupted");
+                Application.Current.Shutdown();
+            }
+            bw = new BackgroundWorker();
+            bw.DoWork += bw_DoWork;
+            if (KeyText.Text != "")
+            {
+                var text = @KeyText.Text;
+                if (text != "" && bw.IsBusy != true)
+                {
+                    bw.RunWorkerAsync(text);
+                    timer.Start();
+                    autostart = true;
+                }
             }
         }
+
+        private void OnClosing(object sender, CancelEventArgs cancelEventArgs)
+        {
+            SendLog("SERVER STOPED TIME WORKED IN SEC " + timer_time);
+            savetofilelog();
+        }
+
         async void bw_DoWork(object sender, DoWorkEventArgs e)
         {
             var worker = sender as BackgroundWorker;
@@ -487,7 +507,7 @@ namespace ChatBot
             {
                 File.WriteAllText(DateTime.Now.ToString("dd.MM.yy hh.mm.ss") + " errorlog.txt", DateTime.Now + " -- " + ex.Message + "\n"
                     + ex.TargetSite.Name + "\n" + ex.StackTrace + "\n" + ex.HelpLink);
-                Application.Exit();
+                Application.Current.Shutdown();
             }
 
         }
@@ -513,33 +533,16 @@ namespace ChatBot
                 }
             }
         }
-        private void button1_Click(object sender, EventArgs e)
-        {
-            var text = @textBox1.Text;
-            if (text != "" && bw.IsBusy != true && autostart == false)
-            {
-                bw.RunWorkerAsync(text);
-                timer1.Start();
-                SendLog("SERVER START");
-            }
-        }
         private void SendLog(string log)
         {
-            textBox2.Invoke((ThreadStart)delegate ()
+            Dispatcher.BeginInvoke(new ThreadStart(delegate
             {
-                textBox2.Text = DateTime.Now + " -- " + log + Environment.NewLine + textBox2.Text;
-            });
-        }
-        private void timer1_Tick(object sender, EventArgs e)
-        {
-            if (timer_time == 1)
-                SendLog("SERVER START");
-            Time.Text = "Chat online: " + timer_time++ + " seconds";
-            if (timer_time % 60 == 0) savetofilelog();
+                LogBox.Text = DateTime.Now + " -- " + log + Environment.NewLine + LogBox.Text;
+            }));
         }
         private void savetofilelog()
         {
-            if (textBox2.Text != "")
+            if (LogBox.Text != "")
             {
                 bool newfile = true;
                 string textlog = "";
@@ -556,12 +559,9 @@ namespace ChatBot
                 }
                 using (var stream = File.CreateText("log.txt"))
                 {
-                    textBox2.Invoke((ThreadStart)delegate ()
-                    {
-                        stream.Write(textBox2.Text);
-                        textBox2.Clear();
-                    });
-                    if (!newfile) stream.Write(textlog);
+                            stream.Write(LogBox.Text);
+                            LogBox.Clear();
+                        if (!newfile) stream.Write(textlog);
                 }
             }
         }
@@ -606,10 +606,39 @@ namespace ChatBot
             }
             return res;
         }
-        private void BotForm_FormClosed(object sender, FormClosedEventArgs e)
+        private void TimerOnTick(object sender, EventArgs eventArgs)
         {
-            SendLog("SERVER STOPED TIME WORKED IN SEC " + timer_time.ToString());
-            savetofilelog();
+            if (timer_time == 1)
+                SendLog("SERVER START");
+            SecondsOnline.Text = timer_time.ToString();
+            timer_time++;
+            if (timer_time % 60 == 0) savetofilelog();
+        }
+
+        private void StartButton_OnClick(object sender, RoutedEventArgs e)
+        {
+            var text = @KeyText.Text;
+            if (text != "" && bw.IsBusy != true && autostart == false)
+            {
+                bw.RunWorkerAsync(text);
+                timer.Start();
+                SendLog("SERVER START");
+            }
+        }
+
+        private void StopButton_OnClick(object sender, RoutedEventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void LoadButton_OnClickButton_OnClick(object sender, RoutedEventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void AddRowButton_OnClick(object sender, RoutedEventArgs e)
+        {
+            throw new NotImplementedException();
         }
     }
 }

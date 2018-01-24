@@ -20,7 +20,7 @@ namespace ChatBot
         public string[] V_Series = new string[4];
         public string[] VSerial = { "SG1", "SGA", "SGU", "Movies" };
         public int taskId = 0;//
-        public bool done=false;//
+        public bool done = false;//
         public bool Ask = false;
         public int AskI = 0;
         public int Score = 0;//
@@ -62,7 +62,8 @@ namespace ChatBot
                 {
                     con.Close();
                     NewUser();
-                }else if(list.Count==1)
+                }
+                else if (list.Count == 1)
                 {
                     taskId = list[0].Task_id;
                     done = (list[0].done == 0) ? false : true;
@@ -101,7 +102,7 @@ namespace ChatBot
                 }
             }
         }
-        public void GetTask(bool old_user=false)
+        public void GetTask(bool old_user = false)
         {
             using (var con = new SqlConnection(constr))
             {
@@ -303,7 +304,7 @@ namespace ChatBot
             }
             SaveToSQl();
         }
-        public void SaveToSQl(bool done=false)
+        public void SaveToSQl(bool done = false)
         {
             AskI = Ask ? 1 : 0;
             if (done)
@@ -314,7 +315,7 @@ namespace ChatBot
                     {
                         LastSer = LastSer.Replace("'", "''");
                     }
-                    using (SqlCommand command = new SqlCommand("UPDATE dbo.UserQuestionInfo SET done=1, Stand="+stand+ ", LastItemsSer='"+LastSer+ "', LastItemsSeas='" + LastSeas + "', Ask="+AskI+" WHERE User_ID=" + Id+";", con))
+                    using (SqlCommand command = new SqlCommand("UPDATE dbo.UserQuestionInfo SET done=1, Stand=" + stand + ", LastItemsSer='" + LastSer + "', LastItemsSeas='" + LastSeas + "', Ask=" + AskI + " WHERE User_ID=" + Id + ";", con))
                     {
                         con.Open();
                         int result = command.ExecuteNonQuery();

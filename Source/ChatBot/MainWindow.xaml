@@ -1,0 +1,64 @@
+﻿<Window x:Class="ChatBot.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ChatBot"
+        mc:Ignorable="d"
+        Title="ChatBot Server" MinHeight="720" MinWidth="1280" Height="720" Width="1280">
+    <Border BorderBrush="Black" Margin="10" BorderThickness="1">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="30"/>
+                <RowDefinition Height="30"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <StackPanel Grid.Column="0" Grid.Row="0" Orientation="Horizontal">
+                <TextBlock Width="100" Text="Key:" FontSize="20" TextAlignment="Left" Padding="10,0,0,5"/>
+                <TextBlock Name="KeyText" HorizontalAlignment="Left" Text="" FontSize="20" TextAlignment="Left" Padding="0,0,0,5"/>
+            </StackPanel>
+            <StackPanel Grid.Column="1" Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Center">
+                <Button Name="StartButton" Click="StartButton_OnClick" Content="Start" Width="100" IsEnabled="True"/>
+                <Button Name="StopButton" Click="StopButton_OnClick" Content="Stop" Width="100" Margin="10,0,0,0" IsEnabled="False"/>
+                <Button Name="LoadButton" Click="LoadButton_OnClickButton_OnClick" Content="Load on Server" Width="100" Margin="10,0,0,0" IsEnabled="False"/>
+                <Button Name="AddRowButton" Click="AddRowButton_OnClick" Content="Add row to Table" Width="100" Margin="10,0,0,0" IsEnabled="True"/>
+            </StackPanel>
+            <StackPanel Grid.Column="0" Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center" Height="30">
+                <TextBlock Text="Seconds online: " FontSize="20" Padding="10,0,0,5" TextAlignment="Left" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+                <TextBlock Name="SecondsOnline" Text="" FontSize="20" Padding="10,0,0,5" TextAlignment="Left" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+            </StackPanel>
+            <Grid Grid.Row="2" Grid.Column="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="100"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="30"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <TextBlock Grid.Column="0" Grid.Row="0" FontSize="20" Text="Log" TextAlignment="Left" Padding="10,0,0,5"/>
+                <ComboBox Name="LogLen" Grid.Column="1" Grid.Row="0"  SelectedIndex="0" FontSize="15" HorizontalContentAlignment="Center" VerticalContentAlignment="Center">
+                    <ComboBoxItem Content="Current" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+                    <ComboBoxItem Content="Last Hour" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+                    <ComboBoxItem Content="Last 12 Hours" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+                    <ComboBoxItem Content="Last Day" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+                    <ComboBoxItem Content="Last Week" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+                </ComboBox>
+                <TextBox Name="LogBox" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" HorizontalScrollBarVisibility="Auto" IsReadOnly="True" TextAlignment="Left" />
+            </Grid>
+            <DataGrid Name="TableGrid" Grid.Column="1" Grid.Row="2">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Text" Width="*"/>
+                    <DataGridTextColumn Header="Serial or Movie" Width="*"/>
+                    <DataGridTextColumn Header="Season" Width="*"/>
+                    <DataGridTextColumn Header="Series" Width="*"/>
+                </DataGrid.Columns>
+            </DataGrid>
+            <TextBlock Name="ResultsBlock" Grid.Column="1" Grid.Row="1" Text="" TextAlignment="Center" VerticalAlignment="Center" FontSize="20"/>
+        </Grid>
+    </Border>
+</Window>
