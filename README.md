@@ -1,6 +1,7 @@
 # SGChatBot
 Telegram chat bot (StarGate Quiz)
 
+Code will be changed and improoved.  
 
 In Release/Debug folder must be Settings.txt file with info:
 Secret_Key_Of_Your_Telegram_Bot|Connection_String_To_Your_Database
